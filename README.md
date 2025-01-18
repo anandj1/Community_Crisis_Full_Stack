@@ -36,10 +36,10 @@ The **Community Crisis Platform** aims to revolutionize crisis management by lev
 ## 📷 Screenshots
 
 ### Normal User Dashboard
-![Normal User Interface](https://ibb.co/303FjL8)
+![Normal User Interface](https://drive.google.com/file/d/1pEODYzd_LJ9_Ohxb7UMqkPNgKxUPZjdD/view?usp=drive_link)
 
 ### Admin Dashboard
-![Admin Interface](https://ibb.co/SsJSgN0)
+![Admin Interface](https://drive.google.com/file/d/18Z-PDX4tqV9ZW8_7IZ0KK32zIiDj_Ok-/view?usp=drive_link)
 
 ---
 
