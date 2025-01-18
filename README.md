@@ -36,26 +36,20 @@ The **Community Crisis Platform** aims to revolutionize crisis management by lev
 ## 📷 Screenshots
 
 ### Normal User Dashboard
-![Normal User Interface](https://drive.google.com/file/d/1pEODYzd_LJ9_Ohxb7UMqkPNgKxUPZjdD/view?usp=drive_link)
+![Normal User Interface](https://github.com/anandj1/Community_Crisis_Full_Stack/blob/main/Screenshot%20(1030).png)
 
 ### Admin Dashboard
-![Admin Interface](https://drive.google.com/file/d/18Z-PDX4tqV9ZW8_7IZ0KK32zIiDj_Ok-/view?usp=drive_link)
+![Admin Interface](https://github.com/anandj1/Community_Crisis_Full_Stack/blob/main/Screenshot%20(1031).png)
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, TailwindCSS
+- **Frontend**: React, TailwindCSS, TypeScript
 - **Backend**: Node.js, Express
 - **Database**: MongoDB
 - **Authentication**: JSON Web Tokens (JWT)
-- **Icons**: FontAwesome and Heroicons
-
+- **Icons**: FontAwesome
 ---
 
-## 📖 Installation
 
-### Clone the Repository
-```bash
-git clone https://github.com/yourusername/community-crisis-platform.git
-cd community-crisis-platform
