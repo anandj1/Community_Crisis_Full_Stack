@@ -11,7 +11,7 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://community-crisis-full-stack.onrender.com'],
+  origin: ['http://localhost:5173', 'https://community-crisis-full-stack.onrender.com','https://crisisconnected.netlify.app/],
   credentials: true
 }));
 
