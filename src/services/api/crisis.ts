@@ -24,10 +24,15 @@ export const crisisApi = {
       formData.append('crisisData', JSON.stringify(crisisData));
       
       if (data.media?.length) {
-        data.media.forEach(file => {
-          formData.append('media', file);
+        data.media.forEach((file) => {
+          if (file instanceof Blob) {
+            formData.append('media', file);
+          } else {
+            console.error('Invalid media file:', file);
+          }
         });
       }
+      
 
       const response = await api.post<{ message: string; crisis: Crisis }>(
         '/crisis',

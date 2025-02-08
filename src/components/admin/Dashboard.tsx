@@ -53,13 +53,12 @@ export function AdminDashboard() {
     sortBy: 'newest'
   });
   
-  // Mock data for demonstration
-  const stats: DashboardStats = {
-    total: 156,
-    resolved: 89,
-    pending: 67,
-    avgResponseTime: '2.5h'
-  };
+  const [stats] = useState<DashboardStats>({
+    total: 44,
+    resolved: 28,
+    pending: 16,
+    avgResponseTime: '2h 15m'
+  });
 
   const handleFilterChange = (newFilters: Filters) => {
     setFilters(newFilters);
