@@ -37,7 +37,7 @@ const sendPasswordResetEmail = async (email, resetToken, name) => {
     subject: 'Password Reset Request',
     html: `
       <h1>Password Reset Request</h1>
-      <p>Hello ${name},</p>
+      <p>Hello <b>${name}</b>,</p>
       <p>You requested to reset your password. Please click the link below to reset your password:</p>
       <a href="${resetUrl}">Reset Password</a>
       <p>This link will expire in 1 hour.</p>
@@ -279,7 +279,7 @@ router.post('/reset-password', async (req, res) => {
       subject: 'Password Reset Successful',
       html: `
         <h1>Password Reset Successful</h1>
-        <p>Hello ${user.name},</p>
+        <p>Hello <b>${user.name}</b>,</p>
         <p>Your password has been successfully reset.</p>
         <p>If you did not perform this action, please contact support immediately.</p>
       `
