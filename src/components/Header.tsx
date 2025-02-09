@@ -35,17 +35,17 @@ export function Header() {
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
           <div className="flex w-full items-center justify-between py-6">
             <div className="flex items-center gap-4">
-              <AlertCircle className="h-8 w-8 text-purple-200" />
-              <span className="ml-2 text-2xl font-bold text-white">CrisisConnect</span>
+              <AlertCircle className="h-6 w-6 text-purple-200" />
+              <span className="ml-1 text-2xl font-bold text-white">CrisisConnect</span>
             </div>
             <div className="flex items-center">
               {user ? (
                 <div className="flex flex-nowrap items-center gap-3 sm:gap-5">
                   <div className="flex items-center gap-3">
-                    <User className="h-6 w-6 text-purple-200" />
+                    <User className="h-7 w-7 text-purple-200" />
                     <span className="text-white text-base">{user.name}</span>
                   </div>
-                  <div className="flex flex-nowrap items-center gap-3 sm:gap-5">
+                  <div className="flex flex-nowrap items-center gap-3 sm:gap-4">
                     <button
                       onClick={handleSignOut}
                       className="rounded-md bg-white/10 backdrop-blur-sm px-3.5 py-2.5 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all duration-200 whitespace-nowrap"
@@ -61,7 +61,7 @@ export function Header() {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-nowrap items-center gap-3 sm:gap-5">
+                <div className="flex flex-nowrap items-center gap-3 sm:gap-4 sm:ml-2">
                   <button
                     data-action="signin"
                     onClick={openSignIn}
