@@ -47,7 +47,7 @@ The **Community Crisis Platform** aims to revolutionize crisis management by lev
 
 - **Frontend**: React, TailwindCSS, TypeScript
 - **Backend**: Node.js, Express
-- **Database**: MongoDB
+- **Database**: MongoDB, Cloudinary
 - **Authentication**: JSON Web Tokens (JWT)
 - **Icons**: FontAwesome
 ---
