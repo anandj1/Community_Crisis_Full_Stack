@@ -38,38 +38,40 @@ export function Header() {
               <AlertCircle className="h-8 w-8 text-purple-200" />
               <span className="ml-2 text-2xl font-bold text-white">CrisisConnect</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
               {user ? (
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+                  <div className="flex items-center gap-2">
                     <User className="h-5 w-5 text-purple-200" />
                     <span className="text-white">{user.name}</span>
                   </div>
-                  <button
-                    onClick={handleSignOut}
-                    className="rounded-md bg-white/10 backdrop-blur-sm px-3.5 py-2.5 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all duration-200"
-                  >
-                    Sign out
-                  </button>
-                  <button
-                    onClick={() => setIsReportModalOpen(true)}
-                    className="rounded-md z-30 bg-purple-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-400 transition-all duration-200"
-                  >
-                    Report Crisis
-                  </button>
+                  <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+                    <button
+                      onClick={handleSignOut}
+                      className="rounded-md bg-white/10 backdrop-blur-sm px-3.5 py-2.5 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all duration-200 whitespace-nowrap"
+                    >
+                      Sign out
+                    </button>
+                    <button
+                      onClick={() => setIsReportModalOpen(true)}
+                      className="rounded-md z-30 bg-purple-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-400 transition-all duration-200 whitespace-nowrap"
+                    >
+                      Report Crisis
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                   <button
                     data-action="signin"
                     onClick={openSignIn}
-                    className="rounded-md z-20 bg-white/10 backdrop-blur-sm px-3.5 py-2.5 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all duration-200"
+                    className="rounded-md z-20 bg-white/10 backdrop-blur-sm px-3.5 py-2.5 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all duration-200 whitespace-nowrap"
                   >
                     Sign in
                   </button>
                   <button
                     onClick={openSignUp}
-                    className="rounded-md z-20 bg-purple-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-400 transition-all duration-200"
+                    className="rounded-md z-20 bg-purple-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-400 transition-all duration-200 whitespace-nowrap"
                   >
                     Sign up
                   </button>
