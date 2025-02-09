@@ -36,7 +36,7 @@ export function Header() {
           <div className="flex w-full items-center justify-between py-6">
             <div className="flex items-center gap-4">
               <AlertCircle className="h-6 w-6 text-purple-200" />
-              <span className="ml-1 text-2xl font-bold text-white">CrisisConnect</span>
+              <span className="ml-1 text-2xl sm:mr-3 font-bold text-white">CrisisConnect</span>
             </div>
             <div className="flex items-center">
               {user ? (
