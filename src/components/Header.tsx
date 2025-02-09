@@ -61,7 +61,7 @@ export function Header() {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <div className="flex f flex-wrap justify-center gap-2 sm:gap-4">
                   <button
                     data-action="signin"
                     onClick={openSignIn}
