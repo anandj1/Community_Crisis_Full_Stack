@@ -34,20 +34,6 @@ export function Header() {
       <header className="bg-gradient-to-r from-purple-800 via-indigo-800 to-blue-800 shadow-lg">
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
           <div className="flex w-full items-center justify-between py-6">
-<<<<<<< HEAD
-            <div className="flex items-center gap-1 sm:gap-1">
-              <AlertCircle className="h-6 w-6 text-purple-200" />
-              <span className="ml-1 mr-2 text-2xl font-bold text-white">CrisisConnect</span>
-            </div>
-            <div className="flex items-center">
-              {user ? (
-                <div className="flex flex-nowrap items-center gap-3 ">
-                  <div className="flex items-center gap-3">
-                    <User className="h-7 w-7 text-purple-200" />
-                    <span className="text-white text-base">{user.name}</span>
-                  </div>
-                  <div className="flex flex-nowrap items-center gap-3 sm:gap-4 ml-1">
-=======
             <div className="flex items-center gap-4 sm:gap-1">
               <AlertCircle className="h-6 w-6 text-purple-200" />
               <span className=" mr-2 text-2xl font-bold text-white">CrisisConnect</span>
@@ -60,7 +46,6 @@ export function Header() {
                     <span className="text-white text-base">{user.name}</span>
                   </div>
                   <div className="flex flex-nowrap items-center gap-3 sm:gap-5">
->>>>>>> df3288b (file_upload)
                     <button
                       onClick={handleSignOut}
                       className="rounded-md bg-white/10 backdrop-blur-sm px-3.5 py-2.5 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all duration-200 whitespace-nowrap"
@@ -76,11 +61,7 @@ export function Header() {
                   </div>
                 </div>
               ) : (
-<<<<<<< HEAD
-                <div className="flex flex-nowrap items-center gap-3 sm:gap-4 sm:ml-2">
-=======
                 <div className="flex flex-nowrap items-center gap-3 sm:gap-5">
->>>>>>> df3288b (file_upload)
                   <button
                     data-action="signin"
                     onClick={openSignIn}
