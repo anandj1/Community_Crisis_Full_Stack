@@ -40,12 +40,12 @@ export function Header() {
             </div>
             <div className="flex items-center">
               {user ? (
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+                <div className="flex flex-nowrap items-center gap-2 sm:gap-4">
                   <div className="flex items-center gap-2">
                     <User className="h-5 w-5 text-purple-200" />
                     <span className="text-white">{user.name}</span>
                   </div>
-                  <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+                  <div className="flex flex-nowrap items-center gap-2 sm:gap-4">
                     <button
                       onClick={handleSignOut}
                       className="rounded-md bg-white/10 backdrop-blur-sm px-3.5 py-2.5 text-sm font-semibold text-white border border-white/20 hover:bg-white/20 transition-all duration-200 whitespace-nowrap"
@@ -61,7 +61,7 @@ export function Header() {
                   </div>
                 </div>
               ) : (
-                <div className="flex f flex-wrap justify-center gap-2 sm:gap-4">
+                <div className="flex flex-nowrap items-center gap-2 sm:gap-4">
                   <button
                     data-action="signin"
                     onClick={openSignIn}
