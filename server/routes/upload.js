@@ -1,20 +1,17 @@
 import express from 'express';
+
 import { upload } from '../utils/storage.js';
+
 import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/', auth, upload.array('media', 5), (req, res) => {
+router.post('/', auth, upload.array('media', 5), async (req, res) => {
   try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: 'No files uploaded' });
-    }
-
     const files = req.files.map(file => ({
       type: file.mimetype.startsWith('image/') ? 'image' : 'video',
-      url: `/uploads/${file.filename}`,
-      filename: file.filename,
-      contentType: file.mimetype
+      url: file.path,
+      public_id: file.filename
     }));
 
     res.json(files);

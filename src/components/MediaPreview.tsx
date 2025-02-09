@@ -1,10 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { X, FileImage, Film, AlertCircle } from 'lucide-react';
+import type { CrisisMedia } from '../types';
 
 interface MediaPreviewProps {
   file: File;
   onRemove: () => void;
   disabled?: boolean;
+}
+
+interface CloudMediaPreviewProps {
+  media: CrisisMedia;
+}
+
+export function CloudMediaPreview({ media }: CloudMediaPreviewProps) {
+  return (
+    <div className="relative group rounded-lg overflow-hidden">
+      {media.type === 'image' ? (
+        <img
+          src={media.secure_url || media.url}
+          alt={media.public_id || 'Crisis media'}
+          className="w-full h-40 object-cover"
+        />
+      ) : (
+        <video
+          src={media.secure_url || media.url}
+          className="w-full h-40 object-cover"
+          controls
+        />
+      )}
+      
+      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+        <p className="text-xs text-white truncate">
+          {media.public_id?.split('/').pop()}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export function MediaPreview({ file, onRemove, disabled }: MediaPreviewProps) {

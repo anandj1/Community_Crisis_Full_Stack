@@ -1,13 +1,9 @@
 import React from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import type { CrisisMedia } from '../../types';
 
 interface ImageGalleryProps {
-  images: Array<{
-    type: 'image' | 'video';
-    url: string;
-    filename?: string;
-    contentType?: string;
-  }>;
+  images: CrisisMedia[];
   onClose: () => void;
 }
 
@@ -33,6 +29,9 @@ export function ImageGallery({ images, onClose }: ImageGalleryProps) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const currentMedia = images[currentIndex];
+  const mediaUrl = currentMedia.secure_url || currentMedia.url;
+
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
       <button
@@ -57,15 +56,15 @@ export function ImageGallery({ images, onClose }: ImageGalleryProps) {
       </button>
 
       <div className="max-w-4xl max-h-[80vh] relative">
-        {images[currentIndex].type === 'image' ? (
+        {currentMedia.type === 'image' ? (
           <img
-            src={images[currentIndex].url}
-            alt={images[currentIndex].filename || 'Crisis image'}
+            src={mediaUrl}
+            alt={currentMedia.public_id || 'Crisis image'}
             className="max-w-full max-h-[80vh] object-contain"
           />
         ) : (
           <video
-            src={images[currentIndex].url}
+            src={mediaUrl}
             controls
             className="max-w-full max-h-[80vh]"
           />

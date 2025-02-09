@@ -1,5 +1,5 @@
 import { api } from './config';
-import type { Crisis, CrisisFormData } from '../../types';
+import type { Crisis, CrisisFormData,CrisisMedia } from '../../types';
 
 export const crisisApi = {
   async reportCrisis(data: CrisisFormData) {

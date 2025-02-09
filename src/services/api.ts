@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { authStore } from './auth/authStore';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -11,21 +12,25 @@ const api = axios.create({
 
 // Add token to requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = authStore.getToken();
+  const user = authStore.getUser();
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    if (user?.role) {
+      config.headers['X-User-Role'] = user.role;
+    }
   }
   return config;
 });
+
 
 // Handle auth errors
 api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      sessionStorage.removeItem('pendingOTPEmail');
+      authStore.clearAuth();
       window.location.href = '/login';
     }
     return Promise.reject(error);

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { AlertTriangle, MapPin, Upload, Info } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
 import { MediaUpload } from '../MediaUpload';
-import { MediaPreview } from '../MediaPreview';
-import type { CrisisFormData } from '../../types';
+import { MediaPreview, CloudMediaPreview } from '../MediaPreview';
+import type { CrisisFormData, CrisisMedia, Severity, Location } from '../../types';
 import { SeveritySelect } from './SeveritySelect';
 import { LocationInput } from './LocationInput';
 
@@ -12,8 +12,7 @@ interface CrisisFormProps {
 }
 
 export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
-  const [formData, setFormData] = useState<CrisisFormData>({
-    id: '',
+  const [formData, setFormData] = useState<Omit<CrisisFormData, 'media'>>({
     title: '',
     description: '',
     location: {
@@ -24,7 +23,7 @@ export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
     severity: 'medium',
   });
 
-  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<(File | CrisisMedia)[]>([]);
   const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,10 +33,24 @@ export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
     setIsSubmitting(true);
 
     try {
-      await onSubmit({
+      // Validate required fields
+      if (!formData.title.trim()) {
+        throw new Error('Title is required');
+      }
+      if (!formData.description.trim()) {
+        throw new Error('Description is required');
+      }
+      if (!formData.location.address.trim()) {
+        throw new Error('Location is required');
+      }
+
+      // Create the submission data
+      const submissionData: CrisisFormData = {
         ...formData,
-        media: mediaFiles
-      });
+        media: mediaFiles.filter((file): file is File => file instanceof File)
+      };
+
+      await onSubmit(submissionData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit crisis report');
     } finally {
@@ -47,12 +60,31 @@ export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
 
   const handleMediaUpload = (files: FileList | null) => {
     if (files) {
-      setMediaFiles(prev => [...prev, ...Array.from(files)]);
+      const newFiles = Array.from(files);
+      if (mediaFiles.length + newFiles.length > 5) {
+        setError('Maximum 5 files allowed');
+        return;
+      }
+      setMediaFiles(prev => [...prev, ...newFiles]);
     }
   };
 
   const handleRemoveMedia = (index: number) => {
     setMediaFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleLocationChange = (location: Location) => {
+    setFormData(prev => ({
+      ...prev,
+      location
+    }));
+  };
+
+  const handleSeverityChange = (severity: Severity) => {
+    setFormData(prev => ({
+      ...prev,
+      severity
+    }));
   };
 
   return (
@@ -77,7 +109,7 @@ export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
                 type="text"
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter a clear, descriptive title"
                 required
@@ -92,7 +124,7 @@ export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
               <textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 rows={4}
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Provide detailed information about the situation"
@@ -107,13 +139,13 @@ export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
 
             <LocationInput
               value={formData.location}
-              onChange={(location) => setFormData({ ...formData, location })}
+              onChange={handleLocationChange}
               disabled={disabled || isSubmitting}
             />
 
             <SeveritySelect
               value={formData.severity}
-              onChange={(severity) => setFormData({ ...formData, severity })}
+              onChange={handleSeverityChange}
               disabled={disabled || isSubmitting}
             />
           </div>
@@ -128,12 +160,19 @@ export function CrisisForm({ onSubmit, disabled }: CrisisFormProps) {
           {mediaFiles.length > 0 && (
             <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">
               {mediaFiles.map((file, index) => (
-                <MediaPreview
-                  key={index}
-                  file={file}
-                  onRemove={() => handleRemoveMedia(index)}
-                  disabled={disabled || isSubmitting}
-                />
+                file instanceof File ? (
+                  <MediaPreview
+                    key={index}
+                    file={file}
+                    onRemove={() => handleRemoveMedia(index)}
+                    disabled={disabled || isSubmitting}
+                  />
+                ) : (
+                  <CloudMediaPreview
+                    key={file.public_id}
+                    media={file}
+                  />
+                )
               ))}
             </div>
           )}

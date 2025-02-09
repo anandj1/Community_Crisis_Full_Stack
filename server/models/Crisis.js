@@ -38,8 +38,9 @@ const crisisSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    filename: String,
-    contentType: String
+    public_id: String,
+    width: Number,
+    height: Number
   }],
   reportedBy: {
     type: mongoose.Schema.Types.ObjectId,

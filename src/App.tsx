@@ -37,10 +37,12 @@ function App() {
       const data = isAdmin
         ? await crisisService.getAllCrises(filters)
         : await crisisService.getMyCrises();
-      setCrises(data);
+        setCrises(Array.isArray(data) ? data : []);
+
     } catch (error) {
       console.error('Failed to fetch crises:', error);
       setError('Failed to load crises. Please try again.');
+      setCrises([]);
     } finally {
       setLoading(false);
     }
