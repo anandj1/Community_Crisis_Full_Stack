@@ -35,7 +35,7 @@ export function Header() {
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
           <div className="flex w-full items-center justify-between py-6">
             <div className="flex items-center gap-1 sm:gap-1">
-              <AlertCircle className="h-5 w-5 text-purple-200" />
+              <AlertCircle className="h-6 w-6 text-purple-200" />
               <span className="ml-1 mr-4 text-2xl sm:mr-3 font-bold text-white">CrisisConnect</span>
             </div>
             <div className="flex items-center">
