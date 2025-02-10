@@ -11,10 +11,12 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-
-  origin: ['http://localhost:5173', 'https://community-crisis-full-stack.onrender.com','https://crisisconnected.netlify.app'],
-
-  credentials: true
+  origin: ['http://localhost:5173', 'https://community-crisis-full-stack.onrender.com', 'https://crisisconnected.netlify.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Role'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 app.use(express.json());
