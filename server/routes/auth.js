@@ -27,8 +27,8 @@ const sendOTPEmail = async (email, otp, name) => {
 };
 
 const sendPasswordResetEmail = async (email, resetToken, name) => {
-  // Default to localhost:5173 if FRONTEND_URL is not set
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+ 
+  const frontendUrl = process.env.FRONTEND_URL;
   const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
   
   const mailOptions = {
