@@ -29,7 +29,7 @@ const sendOTPEmail = async (email, otp, name) => {
 const sendPasswordResetEmail = async (email, resetToken, name) => {
  
   const frontendUrl = process.env.FRONTEND_URL;
-  const resetUrl = `https://crisisconnected.netlify.app/reset-password/${resetToken}`;
+  const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
   
   const mailOptions = {
     from: process.env.EMAIL_USER,
