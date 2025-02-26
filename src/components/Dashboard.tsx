@@ -3,6 +3,30 @@ import { Line, Doughnut } from 'react-chartjs-2';
 import { FilterBar } from './admin/FilterBar';
 import { format, startOfToday, isSameDay } from 'date-fns';
 
+// ✅ Register Chart.js components correctly
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 interface Crisis {
   id: string;
   title: string;
@@ -29,7 +53,7 @@ export function Dashboard({ crises }: DashboardProps) {
     setFilters(updatedFilters);
   };
 
- 
+  // ✅ Filtering Logic
   const filteredCrises = crises
     .filter(c =>
       filters.search
@@ -37,8 +61,8 @@ export function Dashboard({ crises }: DashboardProps) {
           c.description?.toLowerCase().includes(filters.search.toLowerCase())
         : true
     )
-    .filter(c => (filters.severity ? c.severity === filters.severity : true))
-    .filter(c => (filters.status ? c.status === filters.status : true))
+    .filter(c => (filters.severity ? c.severity.toLowerCase() === filters.severity.toLowerCase() : true))
+    .filter(c => (filters.status ? c.status.toLowerCase() === filters.status.toLowerCase() : true))
     .sort((a, b) => {
       if (filters.sortBy === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       if (filters.sortBy === 'oldest') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -47,19 +71,18 @@ export function Dashboard({ crises }: DashboardProps) {
       return 0;
     });
 
+
   const last7Days = [...Array(7)].map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - i);
     return format(d, 'MMM dd');
   }).reverse();
 
- 
   const criticalData = last7Days.map(date =>
     crises.filter(c =>
       format(new Date(c.createdAt), 'MMM dd') === date && c.severity === 'critical'
     ).length
   );
-
 
   const resolvedToday = crises.filter(crisis => {
     if (crisis.status !== 'resolved') return false;
@@ -68,7 +91,7 @@ export function Dashboard({ crises }: DashboardProps) {
     return isSameDay(updateDate, today);
   }).length;
 
- 
+
   const doughnutData = {
     labels: ['Reported', 'In Progress', 'Resolved'],
     datasets: [
@@ -93,7 +116,7 @@ export function Dashboard({ crises }: DashboardProps) {
     ],
   };
 
-  // ✅ Line Chart Data for Critical Incidents
+
   const lineChartData = {
     labels: last7Days,
     datasets: [
@@ -149,10 +172,10 @@ export function Dashboard({ crises }: DashboardProps) {
         </button>
       </div>
 
-      
+    
       <FilterBar filters={filters} onChange={handleFilterChange} />
 
-      
+    
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Active</h3>
@@ -171,6 +194,7 @@ export function Dashboard({ crises }: DashboardProps) {
           <p className="text-3xl font-bold text-green-600">{resolvedToday}</p>
         </div>
       </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
         <div className="bg-white rounded-xl shadow-lg p-6">
