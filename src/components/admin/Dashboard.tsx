@@ -1,188 +1,187 @@
-import React, { useState } from 'react';
-import { StatsOverview } from './StatsOverview';
-import { IssuesList } from './IssuesList';
+import React, { useEffect, useState } from 'react';
+import { Line, Doughnut } from 'react-chartjs-2';
 import { FilterBar } from './FilterBar';
-import { Line, Bar } from 'react-chartjs-2';
-import { format, subDays, isToday } from 'date-fns';
-import { statusConfig } from '../../types/status';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { format, startOfToday, isSameDay } from 'date-fns';
 
-// Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-interface DashboardStats {
-  total: number;
-  resolved: number;
-  resolvedToday: number;
-  pending: number;
-  avgResponseTime: string;
+interface Crisis {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  status: 'reported' | 'inProgress' | 'resolved';
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface Filters {
-  search: string;
-  severity: string;
-  status: string;
-  sortBy: string;
+interface DashboardProps {
+  crises: Crisis[];
 }
 
-export function AdminDashboard() {
-  const [timeRange, setTimeRange] = useState('7d');
-  const [selectedView, setSelectedView] = useState('overview');
-  const [filters, setFilters] = useState<Filters>({
+export function Dashboard({ crises }: DashboardProps) {
+  const [filters, setFilters] = useState({
     search: '',
     severity: '',
     status: '',
-    sortBy: 'newest'
-  });
-  
-  // Mock data - in a real app, this would come from your API
-  const [stats] = useState<DashboardStats>({
-    total: 44,
-    resolved: 28, // Total resolved issues (all time)
-    resolvedToday: 3, // Issues resolved today
-    pending: 16,
-    avgResponseTime: '2h 15m'
+    sortBy: 'newest',
   });
 
-  const handleFilterChange = (newFilters: Filters) => {
-    setFilters(newFilters);
+  const handleFilterChange = (updatedFilters: any) => {
+    setFilters(updatedFilters);
   };
 
-  // Prepare data for charts
-  const last7Days = [...Array(7)].map((_, i) => format(subDays(new Date(), i), 'MMM dd')).reverse();
-  
+ 
+  const filteredCrises = crises
+    .filter(c =>
+      filters.search
+        ? c.title?.toLowerCase().includes(filters.search.toLowerCase()) ||
+          c.description?.toLowerCase().includes(filters.search.toLowerCase())
+        : true
+    )
+    .filter(c => (filters.severity ? c.severity === filters.severity : true))
+    .filter(c => (filters.status ? c.status === filters.status : true))
+    .sort((a, b) => {
+      if (filters.sortBy === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (filters.sortBy === 'oldest') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      if (filters.sortBy === 'severity') return b.severity.localeCompare(a.severity);
+      if (filters.sortBy === 'status') return a.status.localeCompare(b.status);
+      return 0;
+    });
+
+  const last7Days = [...Array(7)].map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    return format(d, 'MMM dd');
+  }).reverse();
+
+
+  const criticalData = last7Days.map(date =>
+    crises.filter(c =>
+      format(new Date(c.createdAt), 'MMM dd') === date && c.severity === 'critical'
+    ).length
+  );
+
+
+  const resolvedToday = crises.filter(crisis => {
+    if (crisis.status !== 'resolved') return false;
+    const today = startOfToday();
+    const updateDate = new Date(crisis.updatedAt);
+    return isSameDay(updateDate, today);
+  }).length;
+
+
+  const doughnutData = {
+    labels: ['Reported', 'In Progress', 'Resolved'],
+    datasets: [
+      {
+        data: [
+          crises.filter(c => c.status === 'reported').length || 0.1,
+          crises.filter(c => c.status === 'inProgress').length || 0.1,
+          crises.filter(c => c.status === 'resolved').length || 0.1
+        ],
+        backgroundColor: [
+          'rgba(234, 179, 8, 0.8)',
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(34, 197, 94, 0.8)',
+        ],
+        borderColor: [
+          'rgb(234, 179, 8)',
+          'rgb(59, 130, 246)',
+          'rgb(34, 197, 94)',
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+ 
   const lineChartData = {
     labels: last7Days,
     datasets: [
       {
-        label: 'Critical Issues',
-        data: last7Days.map(() => Math.floor(Math.random() * 10)),
+        label: 'Critical Incidents',
+        data: criticalData,
         borderColor: 'rgb(239, 68, 68)',
         backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        tension: 0.4,
-      },
-      {
-        label: 'High Priority Issues',
-        data: last7Days.map(() => Math.floor(Math.random() * 15)),
-        borderColor: 'rgb(245, 158, 11)',
-        backgroundColor: 'rgba(245, 158, 11, 0.1)',
         tension: 0.4,
       }
     ]
   };
 
-  const barChartData = {
-    labels: Object.values(statusConfig).map(config => config.label),
-    datasets: [{
-      label: 'Issues by Status',
-      data: [12, 19, 8, 5],
-      backgroundColor: Object.values(statusConfig).map(config => config.bgColor)
-    }]
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+        },
+      },
+    },
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'right' as const,
+      },
+      title: {
+        display: true,
+        text: 'Current Status Distribution',
+      },
+    },
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Crisis Management Dashboard</h1>
-        <div className="flex space-x-4">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-          >
-            <option value="24h">Last 24 Hours</option>
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-            <option value="90d">Last 90 Days</option>
-          </select>
-          <button
-            onClick={() => window.location.reload()}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Refresh Dashboard
-          </button>
-        </div>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800">Crisis Dashboard</h2>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+        >
+          Refresh Data
+        </button>
       </div>
-      
-      <StatsOverview stats={stats} loading={false} />
-      
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Issue Trends</h3>
-          <Line data={lineChartData} options={{
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            }
-          }} />
+
+    
+      <FilterBar filters={filters} onChange={handleFilterChange} />
+
+ 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Active</h3>
+          <p className="text-3xl font-bold text-indigo-600">
+            {crises.filter(c => c.status !== 'resolved').length}
+          </p>
         </div>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Issues by Status</h3>
-          <Bar data={barChartData} options={{
-            responsive: true,
-            plugins: {
-              legend: {
-                display: false
-              }
-            }
-          }} />
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Critical</h3>
+          <p className="text-3xl font-bold text-red-600">
+            {crises.filter(c => c.severity === 'critical' && c.status !== 'resolved').length}
+          </p>
+        </div>
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Resolved Today</h3>
+          <p className="text-3xl font-bold text-green-600">{resolvedToday}</p>
         </div>
       </div>
 
-      <div className="mt-8">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6" aria-label="Tabs">
-              {['overview', 'performance', 'analytics'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setSelectedView(tab)}
-                  className={`
-                    py-4 px-1 border-b-2 font-medium text-sm
-                    ${selectedView === tab
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-                  `}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-            </nav>
-          </div>
-          
-          <div className="p-6">
-            <FilterBar filters={filters} onChange={handleFilterChange} />
-            <div className="mt-6">
-              <IssuesList issues={[]} loading={false} />
-            </div>
-          </div>
+    
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Critical Incidents Trend</h3>
+          <Line data={lineChartData} options={chartOptions} />
+        </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Status Distribution</h3>
+          <Doughnut data={doughnutData} options={doughnutOptions} />
         </div>
       </div>
     </div>
