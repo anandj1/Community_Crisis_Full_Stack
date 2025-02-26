@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { format, parseISO, isToday } from 'date-fns';
+import { format, startOfToday, isSameDay } from 'date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -168,6 +168,14 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     },
   };
 
+  // Get today's resolved issues count
+  const resolvedToday = crises.filter(crisis => {
+    if (crisis.status !== 'resolved') return false;
+    const today = startOfToday();
+    const updateDate = new Date(crisis.updatedAt);
+    return isSameDay(updateDate, today);
+  }).length;
+
   return (
     <div className="space-y-8">
       {/* Stats Cards */}
@@ -187,10 +195,7 @@ export function Dashboard({ crises, userId }: DashboardProps) {
         <div className="glass-card rounded-xl p-6 shadow-lg bg-white">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Resolved Today</h3>
           <p className="text-3xl font-bold text-green-600">
-            {crises.filter(c => {
-              const updatedDate = parseISO(c.updatedAt);
-              return c.status === 'resolved' && isToday(updatedDate);
-            }).length}
+            {resolvedToday}
           </p>
         </div>
       </div>
