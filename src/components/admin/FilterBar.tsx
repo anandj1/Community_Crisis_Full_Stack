@@ -34,7 +34,7 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
         />
       </div>
 
-      {/* 🔥 Severity Filter (Matches Model) */}
+
       <div className="min-w-[200px]">
         <label htmlFor="severity" className="block text-sm font-medium text-gray-700 mb-1">
           Severity
@@ -53,7 +53,6 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
         </select>
       </div>
 
-      {/* 📌 Status Filter (Matches Model) */}
       <div className="min-w-[200px]">
         <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
           Status
