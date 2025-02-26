@@ -111,7 +111,7 @@ function App() {
               <div className="min-h-screen bg-gray-50">
                 <Header />
                 <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-                  {isAdmin && <Dashboard crises={crises} filters={filters} userId={user?.id} />}
+                  {isAdmin && <Dashboard crises={crises} userId={user?.id} filters={filters} onFilterChange={setFilters} />}
                   
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <h1 className="text-3xl font-bold text-gray-900">
