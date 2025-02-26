@@ -35,10 +35,21 @@ function App() {
       setLoading(true);
       setError(null);
       const data = isAdmin
-        ? await crisisService.getAllCrises(filters)
+        ? await crisisService.getAllCrises()
         : await crisisService.getMyCrises();
-        setCrises(Array.isArray(data) ? data : []);
-
+      
+      // Apply filters to the fetched data
+      let filteredData = Array.isArray(data) ? data : [];
+      
+      if (filters.severity) {
+        filteredData = filteredData.filter(crisis => crisis.severity === filters.severity);
+      }
+      
+      if (filters.status) {
+        filteredData = filteredData.filter(crisis => crisis.status === filters.status);
+      }
+      
+      setCrises(filteredData);
     } catch (error) {
       console.error('Failed to fetch crises:', error);
       setError('Failed to load crises. Please try again.');
@@ -48,13 +59,14 @@ function App() {
     }
   };
 
+  // Fetch crises whenever filters change
   useEffect(() => {
     if (isAuthenticated) {
       fetchCrises();
     } else {
       setLoading(false);
     }
-  }, [isAuthenticated, isAdmin, filters]);
+  }, [isAuthenticated, isAdmin, filters.severity, filters.status]);
 
   const handleSignInClick = () => {
     const headerElement = document.querySelector('header');
@@ -73,6 +85,13 @@ function App() {
       console.error('Failed to report crisis:', error);
       throw new Error('Failed to report crisis. Please try again.');
     }
+  };
+
+  const handleFilterChange = (type: 'severity' | 'status', value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [type]: value || undefined // Set to undefined if empty string
+    }));
   };
 
   return (
@@ -130,10 +149,7 @@ function App() {
                         <div className="flex flex-wrap gap-4">
                           <select
                             value={filters.severity || ''}
-                            onChange={(e) => setFilters(prev => ({ 
-                              ...prev, 
-                              severity: e.target.value as Severity || undefined 
-                            }))}
+                            onChange={(e) => handleFilterChange('severity', e.target.value)}
                             className="rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
                           >
                             <option value="">All Severities</option>
@@ -144,10 +160,7 @@ function App() {
                           </select>
                           <select
                             value={filters.status || ''}
-                            onChange={(e) => setFilters(prev => ({ 
-                              ...prev, 
-                              status: e.target.value as Status || undefined 
-                            }))}
+                            onChange={(e) => handleFilterChange('status', e.target.value)}
                             className="rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
                           >
                             <option value="">All Statuses</option>
@@ -216,9 +229,12 @@ function App() {
                         </div>
                       ) : crises.length === 0 ? (
                         <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-                          <div className="text-gray-500 text-lg mb-4">No crises reported yet</div>
+                          <div className="text-gray-500 text-lg mb-4">No crises match your filters</div>
                           <button 
-                            onClick={() => setShowReportForm(true)}
+                            onClick={() => {
+                              setFilters({}); // Clear filters
+                              setShowReportForm(true);
+                            }}
                             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
                           >
                             Report New Crisis
