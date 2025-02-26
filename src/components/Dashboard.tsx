@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Line, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   ArcElement,
   Title,
   Tooltip,
@@ -19,7 +18,6 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   ArcElement,
   Title,
   Tooltip,
@@ -38,91 +36,50 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     resolved: 0
   });
 
-  // Calculate status statistics
+  // ✅ Calculate status statistics
   useEffect(() => {
     const newStatusData = {
       reported: crises.filter(c => c.status === 'reported').length,
-      inProgress: crises.filter(c => c.status === 'inProgress').length,
+      inProgress: crises.filter(c => c.status === 'inProgress').length, // ✅ Fixed
       resolved: crises.filter(c => c.status === 'resolved').length
     };
+
+    console.log("Updated Status Data:", newStatusData); // ✅ Debugging log
     setStatusData(newStatusData);
   }, [crises]);
 
+  // ✅ Generate last 7 days for chart labels
   const last7Days = [...Array(7)].map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - i);
     return format(d, 'MMM dd');
   }).reverse();
 
-  // Critical incidents trend data
-  const criticalData = last7Days.map(date => 
-    crises.filter(c => 
-      format(new Date(c.createdAt), 'MMM dd') === date && 
-      c.severity === 'critical'
+  // ✅ Critical incidents trend data
+  const criticalData = last7Days.map(date =>
+    crises.filter(c =>
+      format(new Date(c.createdAt), 'MMM dd') === date && c.severity === 'critical'
     ).length
   );
 
-  // Status trend data
-  const statusTrendData = last7Days.map(date => ({
-    reported: crises.filter(c => 
-      format(new Date(c.createdAt), 'MMM dd') === date && 
-      c.status === 'reported'
-    ).length,
-    inProgress: crises.filter(c => 
-      format(new Date(c.updatedAt), 'MMM dd') === date && 
-      c.status === 'inProgress'
-    ).length,
-    resolved: crises.filter(c => 
-      format(new Date(c.updatedAt), 'MMM dd') === date && 
-      c.status === 'resolved'
-    ).length,
-  }));
+  // ✅ Get today's resolved issues count
+  const resolvedToday = crises.filter(crisis => {
+    if (crisis.status !== 'resolved') return false;
+    const today = startOfToday();
+    const updateDate = new Date(crisis.updatedAt);
+    return isSameDay(updateDate, today);
+  }).length;
 
-  const lineChartData = {
-    labels: last7Days,
-    datasets: [
-      {
-        label: 'Critical Incidents',
-        data: criticalData,
-        borderColor: 'rgb(239, 68, 68)',
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        tension: 0.4,
-      }
-    ]
-  };
-
-  const statusChartData = {
-    labels: last7Days,
-    datasets: [
-      {
-        label: 'Reported',
-        data: statusTrendData.map(d => d.reported),
-        borderColor: 'rgb(234, 179, 8)',
-        backgroundColor: 'rgba(234, 179, 8, 0.1)',
-        tension: 0.4,
-      },
-      {
-        label: 'In Progress',
-        data: statusTrendData.map(d => d.inProgress),
-        borderColor: 'rgb(59, 130, 246)',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        tension: 0.4,
-      },
-      {
-        label: 'Resolved',
-        data: statusTrendData.map(d => d.resolved),
-        borderColor: 'rgb(34, 197, 94)',
-        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-        tension: 0.4,
-      }
-    ]
-  };
-
+  // ✅ Doughnut Chart Data (Ensures all sections appear)
   const doughnutData = {
     labels: ['Reported', 'In Progress', 'Resolved'],
     datasets: [
       {
-        data: [statusData.reported, statusData.inProgress, statusData.resolved],
+        data: [
+          statusData.reported || 0.1,  // ✅ Ensures visibility
+          statusData.inProgress || 0.1,
+          statusData.resolved || 0.1
+        ],
         backgroundColor: [
           'rgba(234, 179, 8, 0.8)',
           'rgba(59, 130, 246, 0.8)',
@@ -138,6 +95,21 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     ],
   };
 
+  // ✅ Line Chart Data for Critical Incidents
+  const lineChartData = {
+    labels: last7Days,
+    datasets: [
+      {
+        label: 'Critical Incidents',
+        data: criticalData,
+        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.4,
+      }
+    ]
+  };
+
+  // ✅ Chart Options
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -155,6 +127,7 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     },
   };
 
+  // ✅ Doughnut Chart Options
   const doughnutOptions = {
     responsive: true,
     plugins: {
@@ -168,55 +141,50 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     },
   };
 
-  // Get today's resolved issues count
-  const resolvedToday = crises.filter(crisis => {
-    if (crisis.status !== 'resolved') return false;
-    const today = startOfToday();
-    const updateDate = new Date(crisis.updatedAt);
-    return isSameDay(updateDate, today);
-  }).length;
-
   return (
-    <div className="space-y-8">
-      {/* Stats Cards */}
+    <div className="space-y-8 p-6 bg-gray-100 min-h-screen">
+      {/* ✅ Dashboard Title */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800">Crisis Dashboard</h2>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+        >
+          Refresh Data
+        </button>
+      </div>
+
+      {/* ✅ Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-card rounded-xl p-6 shadow-lg bg-white">
+        <div className="bg-white rounded-xl p-6 shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Active</h3>
           <p className="text-3xl font-bold text-indigo-600">
             {crises.filter(c => c.status !== 'resolved').length}
           </p>
         </div>
-        <div className="glass-card rounded-xl p-6 shadow-lg bg-white">
+        <div className="bg-white rounded-xl p-6 shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Critical</h3>
           <p className="text-3xl font-bold text-red-600">
             {crises.filter(c => c.severity === 'critical' && c.status !== 'resolved').length}
           </p>
         </div>
-        <div className="glass-card rounded-xl p-6 shadow-lg bg-white">
+        <div className="bg-white rounded-xl p-6 shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Resolved Today</h3>
-          <p className="text-3xl font-bold text-green-600">
-            {resolvedToday}
-          </p>
+          <p className="text-3xl font-bold text-green-600">{resolvedToday}</p>
         </div>
       </div>
 
-      {/* Charts Grid */}
+      {/* ✅ Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Critical Incidents Trend</h3>
           <Line data={lineChartData} options={chartOptions} />
         </div>
-        
+
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Status Distribution</h3>
           <Doughnut data={doughnutData} options={doughnutOptions} />
         </div>
-      </div>
-
-      {/* Status Trend Chart */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Status Trends</h3>
-        <Line data={statusChartData} options={chartOptions} />
       </div>
     </div>
   );
