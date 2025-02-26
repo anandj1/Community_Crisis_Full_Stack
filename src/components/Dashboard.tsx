@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { format, startOfToday, isSameDay } from 'date-fns';
+import { format, startOfToday, isSameDay, parseISO } from 'date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -60,11 +60,13 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     ).length
   );
 
+  // Updated resolvedToday calculation
   const resolvedToday = crises.filter(crisis => {
     if (crisis.status !== 'resolved') return false;
     const today = startOfToday();
-    const updateDate = new Date(crisis.updatedAt);
-    return isSameDay(updateDate, today);
+    // Parse the resolvedAt date if it exists, otherwise fall back to updatedAt
+    const resolvedDate = crisis.resolvedAt ? parseISO(crisis.resolvedAt) : parseISO(crisis.updatedAt);
+    return isSameDay(resolvedDate, today);
   }).length;
 
   const doughnutData = {
@@ -138,9 +140,15 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     <div className="space-y-8 p-6 bg-gray-100 min-h-screen">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Crisis Dashboard</h2>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+        >
+          Refresh Data
+        </button>
       </div>
 
-    
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Active</h3>
@@ -160,7 +168,7 @@ export function Dashboard({ crises, userId }: DashboardProps) {
         </div>
       </div>
 
- 
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Critical Incidents Trend</h3>
