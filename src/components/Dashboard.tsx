@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Line, Doughnut } from 'react-chartjs-2';
 import { FilterBar } from './admin/FilterBar';
-import { format, startOfToday, isSameDay } from 'date-fns';
-
-// ✅ Register Chart.js components correctly
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { format, startOfToday, isSameDay } from 'date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -27,50 +25,28 @@ ChartJS.register(
   Legend
 );
 
-interface Crisis {
-  id: string;
-  title: string;
-  description: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  status: 'reported' | 'inProgress' | 'resolved';
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface DashboardProps {
-  crises: Crisis[];
+  crises: any[];
+  userId: string;
 }
 
-export function Dashboard({ crises }: DashboardProps) {
-  const [filters, setFilters] = useState({
-    search: '',
-    severity: '',
-    status: '',
-    sortBy: 'newest',
+export function Dashboard({ crises, userId }: DashboardProps) {
+  const [statusData, setStatusData] = useState({
+    reported: 0,
+    inProgress: 0,
+    resolved: 0
   });
 
-  const handleFilterChange = (updatedFilters: any) => {
-    setFilters(updatedFilters);
-  };
+  useEffect(() => {
+    const newStatusData = {
+      reported: crises.filter(c => c.status === 'reported').length,
+      inProgress: crises.filter(c => c.status === 'inProgress').length,
+      resolved: crises.filter(c => c.status === 'resolved').length
+    };
 
-  // ✅ Filtering Logic
-  const filteredCrises = crises
-    .filter(c =>
-      filters.search
-        ? c.title?.toLowerCase().includes(filters.search.toLowerCase()) ||
-          c.description?.toLowerCase().includes(filters.search.toLowerCase())
-        : true
-    )
-    .filter(c => (filters.severity ? c.severity.toLowerCase() === filters.severity.toLowerCase() : true))
-    .filter(c => (filters.status ? c.status.toLowerCase() === filters.status.toLowerCase() : true))
-    .sort((a, b) => {
-      if (filters.sortBy === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (filters.sortBy === 'oldest') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      if (filters.sortBy === 'severity') return b.severity.localeCompare(a.severity);
-      if (filters.sortBy === 'status') return a.status.localeCompare(b.status);
-      return 0;
-    });
-
+    console.log("Updated Status Data:", newStatusData);
+    setStatusData(newStatusData);
+  }, [crises]);
 
   const last7Days = [...Array(7)].map((_, i) => {
     const d = new Date();
@@ -91,15 +67,14 @@ export function Dashboard({ crises }: DashboardProps) {
     return isSameDay(updateDate, today);
   }).length;
 
-
   const doughnutData = {
     labels: ['Reported', 'In Progress', 'Resolved'],
     datasets: [
       {
         data: [
-          crises.filter(c => c.status === 'reported').length || 0.1,
-          crises.filter(c => c.status === 'inProgress').length || 0.1,
-          crises.filter(c => c.status === 'resolved').length || 0.1
+          statusData.reported || 0.1,
+          statusData.inProgress || 0.1,
+          statusData.resolved || 0.1
         ],
         backgroundColor: [
           'rgba(234, 179, 8, 0.8)',
@@ -115,7 +90,6 @@ export function Dashboard({ crises }: DashboardProps) {
       },
     ],
   };
-
 
   const lineChartData = {
     labels: last7Days,
@@ -161,22 +135,13 @@ export function Dashboard({ crises }: DashboardProps) {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="space-y-8 p-6 bg-gray-100 min-h-screen">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Crisis Dashboard</h2>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-        >
-          Refresh Data
-        </button>
       </div>
 
     
-      <FilterBar filters={filters} onChange={handleFilterChange} />
-
-    
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Active</h3>
           <p className="text-3xl font-bold text-indigo-600">
@@ -195,8 +160,8 @@ export function Dashboard({ crises }: DashboardProps) {
         </div>
       </div>
 
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+ 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Critical Incidents Trend</h3>
           <Line data={lineChartData} options={chartOptions} />
