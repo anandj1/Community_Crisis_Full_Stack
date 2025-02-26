@@ -3,7 +3,7 @@ import { StatsOverview } from './StatsOverview';
 import { IssuesList } from './IssuesList';
 import { FilterBar } from './FilterBar';
 import { Line, Bar } from 'react-chartjs-2';
-import { format, subDays } from 'date-fns';
+import { format, subDays, isToday } from 'date-fns';
 import { statusConfig } from '../../types/status';
 import {
   Chart as ChartJS,
@@ -32,6 +32,7 @@ ChartJS.register(
 interface DashboardStats {
   total: number;
   resolved: number;
+  resolvedToday: number;
   pending: number;
   avgResponseTime: string;
 }
@@ -53,9 +54,11 @@ export function AdminDashboard() {
     sortBy: 'newest'
   });
   
+  // Mock data - in a real app, this would come from your API
   const [stats] = useState<DashboardStats>({
     total: 44,
-    resolved: 28,
+    resolved: 28, // Total resolved issues (all time)
+    resolvedToday: 3, // Issues resolved today
     pending: 16,
     avgResponseTime: '2h 15m'
   });
