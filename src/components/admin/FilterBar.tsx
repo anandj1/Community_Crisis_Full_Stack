@@ -1,5 +1,4 @@
 import React from 'react';
-import { severityConfig, statusConfig } from '../../types/status';
 
 interface Filters {
   search: string;
@@ -10,12 +9,17 @@ interface Filters {
 
 interface FilterBarProps {
   filters: Filters;
-  onChange: (filters: Filters) => void;
+  onChange: (updatedFilters: Filters) => void;
 }
 
 export function FilterBar({ filters, onChange }: FilterBarProps) {
+  const handleChange = (key: keyof Filters, value: string) => {
+    onChange({ ...filters, [key]: value });
+  };
+
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap gap-4 bg-white p-4 rounded-lg shadow-md">
+      {/* 🔍 Search Field */}
       <div className="min-w-[200px]">
         <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
           Search
@@ -24,12 +28,13 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
           type="text"
           id="search"
           value={filters.search}
-          onChange={(e) => onChange({ ...filters, search: e.target.value })}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          onChange={(e) => handleChange('search', e.target.value)}
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
           placeholder="Search issues..."
         />
       </div>
 
+      {/* 🔥 Severity Filter (Matches Model) */}
       <div className="min-w-[200px]">
         <label htmlFor="severity" className="block text-sm font-medium text-gray-700 mb-1">
           Severity
@@ -37,18 +42,18 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
         <select
           id="severity"
           value={filters.severity}
-          onChange={(e) => onChange({ ...filters, severity: e.target.value })}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          onChange={(e) => handleChange('severity', e.target.value)}
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
         >
           <option value="">All Severities</option>
-          {Object.entries(severityConfig).map(([value, config]) => (
-            <option key={value} value={value}>
-              {config.label}
-            </option>
-          ))}
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
         </select>
       </div>
 
+      {/* 📌 Status Filter (Matches Model) */}
       <div className="min-w-[200px]">
         <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
           Status
@@ -56,18 +61,17 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
         <select
           id="status"
           value={filters.status}
-          onChange={(e) => onChange({ ...filters, status: e.target.value })}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          onChange={(e) => handleChange('status', e.target.value)}
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
         >
           <option value="">All Statuses</option>
-          {Object.entries(statusConfig).map(([value, config]) => (
-            <option key={value} value={value}>
-              {config.label}
-            </option>
-          ))}
+          <option value="reported">Reported</option>
+          <option value="inProgress">In Progress</option>
+          <option value="resolved">Resolved</option>
         </select>
       </div>
 
+      {/* 🔄 Sort By Filter */}
       <div className="min-w-[200px]">
         <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 mb-1">
           Sort By
@@ -75,8 +79,8 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
         <select
           id="sortBy"
           value={filters.sortBy}
-          onChange={(e) => onChange({ ...filters, sortBy: e.target.value })}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          onChange={(e) => handleChange('sortBy', e.target.value)}
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
         >
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
