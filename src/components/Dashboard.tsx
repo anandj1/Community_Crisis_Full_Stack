@@ -36,33 +36,29 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     resolved: 0
   });
 
-  // ✅ Calculate status statistics
   useEffect(() => {
     const newStatusData = {
       reported: crises.filter(c => c.status === 'reported').length,
-      inProgress: crises.filter(c => c.status === 'inProgress').length, // ✅ Fixed
+      inProgress: crises.filter(c => c.status === 'inProgress').length,
       resolved: crises.filter(c => c.status === 'resolved').length
     };
 
-    console.log("Updated Status Data:", newStatusData); // ✅ Debugging log
+    console.log("Updated Status Data:", newStatusData);
     setStatusData(newStatusData);
   }, [crises]);
 
-  // ✅ Generate last 7 days for chart labels
   const last7Days = [...Array(7)].map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - i);
     return format(d, 'MMM dd');
   }).reverse();
 
-  // ✅ Critical incidents trend data
   const criticalData = last7Days.map(date =>
     crises.filter(c =>
       format(new Date(c.createdAt), 'MMM dd') === date && c.severity === 'critical'
     ).length
   );
 
-  // ✅ Get today's resolved issues count
   const resolvedToday = crises.filter(crisis => {
     if (crisis.status !== 'resolved') return false;
     const today = startOfToday();
@@ -70,13 +66,12 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     return isSameDay(updateDate, today);
   }).length;
 
-  // ✅ Doughnut Chart Data (Ensures all sections appear)
   const doughnutData = {
     labels: ['Reported', 'In Progress', 'Resolved'],
     datasets: [
       {
         data: [
-          statusData.reported || 0.1,  // ✅ Ensures visibility
+          statusData.reported || 0.1,
           statusData.inProgress || 0.1,
           statusData.resolved || 0.1
         ],
@@ -95,7 +90,6 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     ],
   };
 
-  // ✅ Line Chart Data for Critical Incidents
   const lineChartData = {
     labels: last7Days,
     datasets: [
@@ -109,7 +103,6 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     ]
   };
 
-  // ✅ Chart Options
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -127,7 +120,6 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     },
   };
 
-  // ✅ Doughnut Chart Options
   const doughnutOptions = {
     responsive: true,
     plugins: {
@@ -143,7 +135,6 @@ export function Dashboard({ crises, userId }: DashboardProps) {
 
   return (
     <div className="space-y-8 p-6 bg-gray-100 min-h-screen">
-      {/* ✅ Dashboard Title */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Crisis Dashboard</h2>
         <button
@@ -154,7 +145,7 @@ export function Dashboard({ crises, userId }: DashboardProps) {
         </button>
       </div>
 
-      {/* ✅ Stats Cards */}
+    
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Active</h3>
@@ -174,7 +165,7 @@ export function Dashboard({ crises, userId }: DashboardProps) {
         </div>
       </div>
 
-      {/* ✅ Charts Grid */}
+     
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Critical Incidents Trend</h3>
