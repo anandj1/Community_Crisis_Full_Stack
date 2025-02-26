@@ -4,6 +4,7 @@ import { AlertTriangle, CheckCircle, Clock, Activity } from 'lucide-react';
 interface Stats {
   total: number;
   resolved: number;
+  resolvedToday: number;
   pending: number;
   avgResponseTime: string;
 }
@@ -23,16 +24,23 @@ export function StatsOverview({ stats, loading }: StatsOverviewProps) {
       bgColor: 'bg-blue-100'
     },
     {
-      name: 'Resolved',
+      name: 'Total Resolved',
       value: stats.resolved,
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-100'
     },
     {
+      name: 'Resolved Today',
+      value: stats.resolvedToday,
+      icon: CheckCircle,
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-100'
+    },
+    {
       name: 'Pending',
       value: stats.pending,
-      icon: Clock,
+      icon: Clock,  
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100'
     },
@@ -47,8 +55,8 @@ export function StatsOverview({ stats, loading }: StatsOverviewProps) {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        {[...Array(5)].map((_, i) => (
           <div key={i} className="animate-pulse bg-gray-100 rounded-lg h-32"></div>
         ))}
       </div>
@@ -56,7 +64,7 @@ export function StatsOverview({ stats, loading }: StatsOverviewProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
       {items.map((item) => (
         <div
           key={item.name}
