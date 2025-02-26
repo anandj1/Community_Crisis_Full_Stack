@@ -42,7 +42,7 @@ export function Dashboard({ crises, userId }: DashboardProps) {
   useEffect(() => {
     const newStatusData = {
       reported: crises.filter(c => c.status === 'reported').length,
-      inProgress: crises.filter(c => c.status === 'in_progress').length,
+      inProgress: crises.filter(c => c.status === 'inProgress').length,
       resolved: crises.filter(c => c.status === 'resolved').length
     };
     setStatusData(newStatusData);
@@ -70,7 +70,7 @@ export function Dashboard({ crises, userId }: DashboardProps) {
     ).length,
     inProgress: crises.filter(c => 
       format(new Date(c.updatedAt), 'MMM dd') === date && 
-      c.status === 'in_progress'
+      c.status === 'inProgress'
     ).length,
     resolved: crises.filter(c => 
       format(new Date(c.updatedAt), 'MMM dd') === date && 
